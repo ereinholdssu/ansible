@@ -1,0 +1,9 @@
+---
+- name: Run Yum Update
+  hosts: all
+  become: true
+  tasks:
+    - name: Perform Yum Update
+      yum:
+        name: '*'
+        state: latest

@@ -4,14 +4,9 @@
   become: true
   tasks:
     - name: Install system updates for RHEL and CentOS systems
-      yum:
-        name: '*'
-        state: latest
-        update_cache: yes
-      when:
-        - ansible_os_family == "RedHat"
-        - ansible_distribution == "CentOS"
+      command: yum update -y
       register: yum_update_result
+      changed_when: yum_update_result.rc == 0
 
     - name: Report if no updates were needed
       debug:

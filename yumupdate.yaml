@@ -8,23 +8,21 @@
         name: '*'
         state: latest
         update_cache: yes
-       #cache_valid_time: 3600
       when:
         - ansible_os_family == "RedHat"
         - ansible_distribution == "CentOS"
-      register: yum_update_result  # Added this line to capture the output of the yum command
+      register: yum_update_result
 
     - name: Report if no updates were needed
       debug:
         msg: "No updates needed"
-      when: "'No packages marked for update' in yum_update_result.stdout"  # Added this line to check if there were no updates needed
+      when: yum_update_result is defined and yum_update_result.changed == false
 
     - name: Install system updates for ubuntu systems
       apt:
         name: '*'
         state: latest
         update_cache: yes
-       #cache_valid_time: 3600
       when:
         - ansible_os_family == "Debian"
         - ansible_distribution == "Ubuntu"

@@ -7,6 +7,9 @@
       command: yum update -y
       register: yum_update_result
       changed_when: yum_update_result.rc == 0
+      when:
+        - ansible_os_family == "RedHat"
+        - ansible_distribution == "CentOS"
 
     - name: Print Yum Update Output
       debug:

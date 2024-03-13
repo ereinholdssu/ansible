@@ -3,7 +3,7 @@
   hosts: all
   become: true
   tasks:
-    - name: Install system updates for centos systems
+    - name: Install system updates for RHEL and CentOS systems
       yum:
         name: '*'
         state: latest
@@ -18,7 +18,7 @@
         msg: "No updates needed"
       when: yum_update_result is defined and yum_update_result.changed == false
 
-    - name: Install system updates for ubuntu systems
+    - name: Install system updates for Debian and Ubuntu systems
       apt:
         name: '*'
         state: latest

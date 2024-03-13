@@ -8,10 +8,9 @@
       register: yum_update_result
       changed_when: yum_update_result.rc == 0
 
-    - name: Report if no updates were needed
+    - name: Print Yum Update Output
       debug:
-        msg: "No updates needed"
-      when: yum_update_result is defined and yum_update_result.changed == false
+        msg: "{{ yum_update_result.stdout }}"
 
     - name: Install system updates for Debian and Ubuntu systems
       apt:

@@ -14,6 +14,7 @@
     - name: Print Yum Update Output
       debug:
         msg: "{{ yum_update_result.stdout }}"
+      when: yum_update_result is defined
 
     - name: Install system updates for Debian and Ubuntu systems
       apt:

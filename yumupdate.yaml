@@ -7,14 +7,11 @@
       command: yum update -y
       register: yum_update_result
       changed_when: yum_update_result.rc == 0
-      when:
-        - ansible_os_family == "RedHat"
-        - ansible_distribution == "CentOS"
 
-    - name: Print Yum Update Output
+    - name: Report if no updates were needed
       debug:
-        msg: "{{ yum_update_result.stdout }}"
-      when: yum_update_result is defined
+        msg: "No updates needed"
+      when: yum_update_result is defined and yum_update_result.changed == false
 
     - name: Install system updates for Debian and Ubuntu systems
       apt:

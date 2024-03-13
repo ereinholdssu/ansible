@@ -2,7 +2,7 @@
 - name: Run Yum Update
   hosts: all
   become: true
-   tasks:
+  tasks:
     - name: Install system updates for centos systems
       yum:
         name: '*'
@@ -12,8 +12,7 @@
       when:
         - ansible_os_family == "RedHat"
         - ansible_distribution == "CentOS"
-
-   register: yum_update_result  # Added this line to capture the output of the yum command
+      register: yum_update_result  # Added this line to capture the output of the yum command
 
     - name: Report if no updates were needed
       debug:

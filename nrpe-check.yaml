@@ -5,3 +5,8 @@
   tasks:
     - name: Run check_all_disks
       command: /usr/local/nagios/libexec/check_nrpe -H 127.0.0.1 -c check_all_disks
+      register: nrpe_output
+
+    - name: Display NRPE output
+      debug:
+        var: nrpe_output.stdout_lines

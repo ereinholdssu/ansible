@@ -17,11 +17,10 @@
         dest: /tmp
         remote_src: yes
 
-    - name: Change directory to extracted NRPE agent directory
-      command: cd /tmp/linux-nrpe-agent
-
     - name: Run full install
       command: /tmp/linux-nrpe-agent/fullinstall -n -i 172.25.200.134
+       args:
+        chdir: /tmp/linux-nrpe-agent
 
     - name: Add SSU Configuration to nrpe.cfg
       command: |

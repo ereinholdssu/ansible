@@ -27,7 +27,7 @@
 
     - name: Add SSU Configuration to nrpe.cfg
       command: |
-        sudo tee -a /usr/local/nagios/etc/nrpe.cfg <<EOF
+        tee -a /usr/local/nagios/etc/nrpe.cfg <<EOF
         #############################
         #SSU Configuration Commands
         command[check_users]=/usr/local/nagios/libexec/check_users -w 5 -c 10

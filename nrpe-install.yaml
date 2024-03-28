@@ -11,16 +11,32 @@
         url: http://assets.nagios.com/downloads/nagiosxi/agents/linux-nrpe-agent.tar.gz
         dest: /tmp/linux-nrpe-agent.tar.gz
 
+    - name: Pause for 5 seconds
+      pause:
+        seconds: 5
+
     - name: Extract NRPE agent tarball
       unarchive:
         src: /tmp/linux-nrpe-agent.tar.gz
         dest: /tmp
 
+    - name: Pause for 5 seconds
+      pause:
+        seconds: 5
+
     - name: Change directory to extracted NRPE agent directory
       command: cd /tmp/linux-nrpe-agent
 
+    - name: Pause for 5 seconds
+      pause:
+        seconds: 5
+
     - name: Run full install
       command: ./fullinstall -n -i 172.25.200.134
+
+    - name: Pause for 5 seconds
+      pause:
+        seconds: 5
 
     - name: Add SSU Configuration to nrpe.cfg
       command: |
@@ -34,7 +50,15 @@
         command[check_all_disks]=/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /
         EOF
 
+    - name: Pause for 5 seconds
+      pause:
+        seconds: 5
+
     - name: Restart xinetd service
       systemd:
         name: xinetd
         state: restarted
+
+    - name: Pause for 5 seconds
+      pause:
+        seconds: 5

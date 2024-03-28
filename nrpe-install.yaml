@@ -21,7 +21,7 @@
       command: cd /tmp/linux-nrpe-agent
 
     - name: Run full install
-      command: ./fullinstall -n -i 172.25.200.134
+      command: /tmp/linux-nrpe-agent/fullinstall -n -i 172.25.200.134
 
     - name: Add SSU Configuration to nrpe.cfg
       command: |

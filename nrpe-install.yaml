@@ -25,19 +25,26 @@
       args:
         chdir: /tmp/linux-nrpe-agent
 
-    - name: Add SSU Configuration to nrpe.cfg
-      command: |
-        tee -a /usr/local/nagios/etc/nrpe.cfg <<EOF
-        #############################
-        #SSU Configuration Commands
-        command[check_users]=/usr/local/nagios/libexec/check_users -w 5 -c 10
-        command[check_load]=/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,25,20
-        command[check_zombie_procs]=/usr/local/nagios/libexec/check_procs -w 5 -c 10 -s Z
-        command[check_total_procs]=/usr/local/nagios/libexec/check_procs -w 150 -c 200
-        command[check_all_disks]=/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /
-        EOF
+    - name: Append SSU Configuration to nrpe.cfg
+      blockinfile:
+        path: /usr/local/nagios/etc/nrpe.cfg
+        block: |
+          command[check_users]=/usr/local/nagios/libexec/check_users -w 5 -c 10
+          command[check_load]=/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,25,20
+          command[check_zombie_procs]=/usr/local/nagios/libexec/check_procs -w 5 -c 10 -s Z
+          command[check_total_procs]=/usr/local/nagios/libexec/check_procs -w 150 -c 200
+          command[check_all_disks]=/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /
+        marker: "### SSU Ansible Managed Text ###"
 
     - name: Restart xinetd service
       systemd:
         name: xinetd
         state: restarted
+
+    - name: Run check_all_disks
+      command: /usr/local/nagios/libexec/check_nrpe -H 127.0.0.1 -c check_all_disks
+      register: nrpe_output
+
+    - name: Display NRPE output
+      debug:
+        var: nrpe_output.stdout_lines

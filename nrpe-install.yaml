@@ -1,0 +1,40 @@
+---
+- name: Install NRPE Agent
+  hosts: all
+  become: yes
+  tasks:
+    - name: Change directory to /tmp
+      command: cd /tmp
+
+    - name: Download NRPE agent tarball
+      get_url:
+        url: http://assets.nagios.com/downloads/nagiosxi/agents/linux-nrpe-agent.tar.gz
+        dest: /tmp/linux-nrpe-agent.tar.gz
+
+    - name: Extract NRPE agent tarball
+      unarchive:
+        src: /tmp/linux-nrpe-agent.tar.gz
+        dest: /tmp
+
+    - name: Change directory to extracted NRPE agent directory
+      command: cd /tmp/linux-nrpe-agent
+
+    - name: Run full install
+      command: ./fullinstall -n -i 172.25.200.134
+
+    - name: Add SSU Configuration to nrpe.cfg
+      command: |
+        sudo tee -a /usr/local/nagios/etc/nrpe.cfg <<EOF
+        #############################
+        #SSU Configuration Commands
+        command[check_users]=/usr/local/nagios/libexec/check_users -w 5 -c 10
+        command[check_load]=/usr/local/nagios/libexec/check_load -w 15,10,5 -c 30,25,20
+        command[check_zombie_procs]=/usr/local/nagios/libexec/check_procs -w 5 -c 10 -s Z
+        command[check_total_procs]=/usr/local/nagios/libexec/check_procs -w 150 -c 200
+        command[check_all_disks]=/usr/local/nagios/libexec/check_disk -w 20% -c 10% -p /
+        EOF
+
+    - name: Restart xinetd service
+      systemd:
+        name: xinetd
+        state: restarted

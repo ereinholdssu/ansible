@@ -1,0 +1,7 @@
+---
+- name: Run check_nrpe command
+  hosts: your_target_host
+  become: no
+  tasks:
+    - name: Run check_all_disks
+      command: /usr/local/nagios/libexec/check_nrpe -H 127.0.0.1 -c check_all_disks

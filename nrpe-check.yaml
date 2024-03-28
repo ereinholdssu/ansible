@@ -1,6 +1,6 @@
 ---
 - name: Run check_nrpe command
-  hosts: your_target_host
+  hosts: all
   become: no
   tasks:
     - name: Run check_all_disks

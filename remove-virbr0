@@ -1,0 +1,20 @@
+---
+- name: Remove virbr0 interface and qemu-kvm
+  hosts: all
+  become: yes
+  tasks:
+    - name: Remove packages qemu-kvm, libvirt, libvirt-client, and bridge-utils
+      yum:
+        name: "{{ item }}"
+        state: absent
+      with_items:
+        - qemu-kvm
+        - libvirt
+        - libvirt-client
+        - bridge-utils
+
+    - name: Bring down interface virbr0
+      command: ifconfig virbr0 down
+
+    - name: Delete interface virbr0
+      command: ip link delete virbr0

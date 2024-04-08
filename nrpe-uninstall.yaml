@@ -1,6 +1,6 @@
 ---
 - name: Uninstall NRPE and xinetd
-  hosts: your_target_hosts
+  hosts: all
   become: true
   tasks:
     - name: Check status of xinetd before uninstallation

@@ -1,0 +1,46 @@
+---
+- name: Install NCPA and configure
+  hosts: all
+  become: true
+  tasks:
+    - name: Check RHEL version
+      command: cat /etc/redhat-release
+      register: rhel_version
+      changed_when: false
+
+    - name: Install NCPA on RHEL 8
+      when: "'Red Hat Enterprise Linux release 8' in rhel_version.stdout"
+      shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el8.x86_64.rpm
+      args:
+        warn: false
+
+    - name: Install NCPA on RHEL 7
+      when: "'Red Hat Enterprise Linux release 7' in rhel_version.stdout"
+      shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el7.x86_64.rpm
+      args:
+        warn: false
+
+    - name: Configure NCPA
+      block:
+        - name: Set community string in ncpa.cfg
+          replace:
+            path: /usr/local/ncpa/etc/ncpa.cfg
+            regexp: '^community_string = .*'
+            replace: 'community_string = Nagk2F@hVr3Ls6Tq8Xj@#SSU'
+
+        - name: Restart NCPA listener
+          service:
+            name: ncpa_listener
+            state: restarted
+
+        - name: Add port 5693/tcp to firewall
+          firewalld:
+            port: 5693/tcp
+            state: enabled
+            permanent: yes
+
+        - name: Reload firewall
+          service:
+            name: firewalld
+            state: reloaded
+      become: true

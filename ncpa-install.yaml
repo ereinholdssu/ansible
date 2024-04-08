@@ -9,13 +9,13 @@
       changed_when: false
 
     - name: Install NCPA on RHEL 8
-      when: "'Red Hat Enterprise Linux release 8' in rhel_version.stdout"
+      when: rhel_version.stdout | regex_search('release 8')
       shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el8.x86_64.rpm
       args:
         warn: false
 
     - name: Install NCPA on RHEL 7
-      when: "'Red Hat Enterprise Linux release 7' in rhel_version.stdout"
+      when: rhel_version.stdout | regex_search('release 7')
       shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el7.x86_64.rpm
       args:
         warn: false

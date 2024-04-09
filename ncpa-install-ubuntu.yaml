@@ -11,7 +11,7 @@
         dest: "/tmp/ncpa-latest.amd64.deb"
 
     - name: Install NCPA package
-      command: dpkg -i /tmp/ncpa-latest.amd64.deb
+      command: sudo dpkg -i /tmp/ncpa-latest.amd64.deb
 
     - name: Configure NCPA
       lineinfile:

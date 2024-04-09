@@ -13,8 +13,8 @@
     - name: Install NCPA package
       apt:
         deb: "/tmp/ncpa-latest.amd64.deb"
-      sudo: true
-
+        state: present
+        
     - name: Configure NCPA
       lineinfile:
         path: "/usr/local/ncpa/etc/ncpa.cfg"

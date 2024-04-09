@@ -4,7 +4,7 @@
   tasks:
     - name: Run command with sudo and display prompt if encountered
       expect:
-        command: uptime
+        command: sudo uptime
         responses:
           '.*password.*': "REDACTED"  # Provide a generic response for any password prompt
       register: command_output

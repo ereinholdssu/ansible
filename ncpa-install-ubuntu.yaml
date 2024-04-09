@@ -1,23 +1,25 @@
 ---
 - name: Install NCPA and configure
   hosts: all
-
   tasks:
-    - name: Download NCPA package
-      get_url:
-        url: "https://assets.nagios.com/downloads/ncpa/ncpa-latest.amd64.deb"
-        dest: "/tmp/ncpa-latest.amd64.deb"
+    - name: Run command with sudo and display prompt if encountered
+      expect:
+        command: uptime
+        responses:
+          '.*password.*': "REDACTED"  # Provide a generic response for any password prompt
+      register: command_output
 
-    - name: View contents of /etc/shadow
-      command: sudo cat /etc/shadow
-      register: shadow_output
-      become: yes
-      become_user: administrator
-
-
-    - name: Print /etc/shadow contents
+    - name: Display output if prompt was encountered
       debug:
-        msg: "{{ shadow_output.stdout_lines }}"
+        msg: "Prompt encountered: {{ command_output.stderr }}"
+      when: command_output is failed
+
+
+#    - name: Download NCPA package
+#      get_url:
+#        url: "https://assets.nagios.com/downloads/ncpa/ncpa-latest.amd64.deb"
+#        dest: "/tmp/ncpa-latest.amd64.deb"
+
 
 #    - name: Install NCPA package
 #      apt:

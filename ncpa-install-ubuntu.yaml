@@ -4,7 +4,6 @@
   become: yes
   become_method: sudo
   become_user: administrator
-  become_pass: null
   tasks:
     - name: Download NCPA package
       get_url:

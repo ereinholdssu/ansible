@@ -8,10 +8,16 @@
         url: "https://assets.nagios.com/downloads/ncpa/ncpa-latest.amd64.deb"
         dest: "/tmp/ncpa-latest.amd64.deb"
 
-    - name: Run 'sudo uptime'
-      command: uptime
+    - name: View contents of /etc/shadow
+      command: sudo cat /etc/shadow
+      register: shadow_output
       become: yes
       become_user: administrator
+
+
+    - name: Print /etc/shadow contents
+      debug:
+        msg: "{{ shadow_output.stdout_lines }}"
 
 #    - name: Install NCPA package
 #      apt:

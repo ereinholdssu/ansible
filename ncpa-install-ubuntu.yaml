@@ -9,7 +9,7 @@
         dest: "/tmp/ncpa-latest.amd64.deb"
 
     - name: Run 'sudo uptime'
-      command: sudo uptime
+      command: uptime
       become: yes
       become_user: administrator
 

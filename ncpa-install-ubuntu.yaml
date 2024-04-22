@@ -4,15 +4,10 @@
   tasks:
     - name: Run command with sudo and display prompt if encountered
       expect:
-        command: sudo uptime
-        responses:
-          '.*password.*': "REDACTED"  # Provide a generic response for any password prompt
-      register: command_output
+        command: cat /etc/shadow
+        become: true
 
-    - name: Display output if prompt was encountered
-      debug:
-        msg: "Prompt encountered: {{ command_output.stderr }}"
-      when: command_output is failed
+
 
 
 #    - name: Download NCPA package

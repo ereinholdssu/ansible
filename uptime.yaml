@@ -1,5 +1,5 @@
 ---
-- name: Check Uptime
+- name: Check Server Uptime
   hosts: all
   tasks:
     - name: Get Uptime

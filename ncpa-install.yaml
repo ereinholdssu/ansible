@@ -39,8 +39,4 @@
             state: enabled
             permanent: yes
 
-        - name: Reload firewall
-          service:
-            name: firewalld
-            state: reloaded
       become: true

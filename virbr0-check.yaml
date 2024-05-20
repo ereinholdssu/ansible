@@ -1,17 +1,28 @@
 ---
 - name: Check for presence of virbr0 interface
   hosts: all
+  gather_facts: no
   tasks:
     - name: Run command to check for virbr0 interface
       command: ip addr show
       register: ip_output
 
-    - name: Search for virbr0 in command output
-      debug:
-        msg: "virbr0 interface found."
+    - name: Set fact if virbr0 interface is found
+      set_fact:
+        virbr0_present: true
       when: "'virbr0' in ip_output.stdout"
 
-    - name: Report missing virbr0 interface
+    - name: Set fact if virbr0 interface is missing
+      set_fact:
+        virbr0_present: false
+      when: "'virbr0' not in ip_output.stdout"
+
+    - name: Report if virbr0 interface is found
+      debug:
+        msg: "virbr0 interface found."
+      when: virbr0_present
+
+    - name: Report if virbr0 interface is missing
       debug:
         msg: "virbr0 interface missing."
-      when: "'virbr0' not in ip_output.stdout"
+      when: not virbr0_present

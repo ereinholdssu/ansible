@@ -15,4 +15,6 @@
         mode: +x
 
     - name: Execute UEMS Linux Agent installer
-      ansible.builtin.shell: "/tmp/UEMS_LinuxAgent.bin"
+      ansible.builtin.shell:
+        cmd: "./UEMS_LinuxAgent.bin"
+        chdir: "/tmp"

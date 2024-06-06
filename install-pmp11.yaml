@@ -13,3 +13,6 @@
         src: /tmp/LocalOffice_UEMSLinuxAgent.zip
         dest: /tmp
         remote_src: yes
+
+    - name: Run UEMS Linux Agent installer
+      command: /tmp/UEMS_LinuxAgent.bin

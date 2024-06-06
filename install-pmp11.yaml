@@ -1,0 +1,22 @@
+---
+- name: Install UEMS Linux Agent
+  hosts: all
+  become: true
+  tasks:
+    - name: Download UEMS Linux Agent ZIP file
+      get_url:
+        url: "https://www.dropbox.com/scl/fi/ffky39ockyerk8tq6z2j2/LocalOffice_UEMSLinuxAgent.zip?rlkey=jvfkpuhpuxou85gf6sl80s892&dl=0"
+        dest: /tmp/LocalOffice_UEMSLinuxAgent.zip
+
+    - name: Unzip UEMS Linux Agent
+      unarchive:
+        src: /tmp/LocalOffice_UEMSLinuxAgent.zip
+        dest: /tmp
+
+    - name: Change permissions of UEMS Linux Agent binary
+      file:
+        path: /tmp/UEMS_LinuxAgent.bin
+        mode: +x
+
+    - name: Run UEMS Linux Agent installer
+      command: sudo /tmp/UEMS_LinuxAgent.bin

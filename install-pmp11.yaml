@@ -14,5 +14,5 @@
         dest: /tmp
         remote_src: yes
 
-    - name: Run UEMS Linux Agent installer
-      command: /tmp/UEMS_LinuxAgent.bin
+    - name: Execute UEMS Linux Agent installer
+      ansible.builtin.shell: "sh /tmp/UEMS_LinuxAgent.bin"

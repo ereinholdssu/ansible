@@ -3,21 +3,16 @@
   hosts: all
   become: true
   tasks:
-    - name: Copy UEMS Linux Agent ZIP file from local server to remote
+    - name: Copy serverinfo.json from local server to remote
       copy:
-        src: /home/ssuadmin/Downloads/LocalOffice_UEMSLinuxAgent.zip
-        dest: /tmp/LocalOffice_UEMSLinuxAgent.zip
+        src: /home/ssuadmin/Downloads/UEMS/serverinfo.json
+        dest: /tmp/serverinfo.json
 
-    - name: Unzip UEMS Linux Agent
-      unarchive:
-        src: /tmp/LocalOffice_UEMSLinuxAgent.zip
-        dest: /tmp
-        remote_src: yes
-
-    - name: Make UEMS Linux Agent installer executable
-      ansible.builtin.file:
-        path: /tmp/UEMS_LinuxAgent.bin
-        mode: '+x'
+    - name: Copy UEMS Linux Agent binary from local server to remote
+      copy:
+        src: /home/ssuadmin/Downloads/UEMS/UEMS_LinuxAgent.bin
+        dest: /tmp/UEMS_LinuxAgent.bin
+        mode: +x
 
     - name: Execute UEMS Linux Agent installer
       ansible.builtin.shell: "/tmp/UEMS_LinuxAgent.bin"

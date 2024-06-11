@@ -1,0 +1,12 @@
+---
+- name: Check Server for Segmentation Faults
+  hosts: all
+  tasks:
+
+    - name: Count Segmentation Faults in Log
+      command: cat /usr/local/manageengine/uems_agent/logs/computer0.log | grep -c "segmentation fault"
+      register: segfault_count
+
+    - name: Display Segmentation Fault Count
+      debug:
+        msg: "Segmentation fault count in log on {{ inventory_hostname }} is {{ segfault_count.stdout }}"

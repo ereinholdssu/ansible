@@ -5,6 +5,7 @@
     - name: Count Segmentation Faults in Log
       shell: cat /usr/local/manageengine/uems_agent/logs/computer0.log | grep -c "segmentation fault"
       register: segfault_count
+      failed_when: segfault_count.rc not in [0, 1]
       ignore_errors: yes
 
     - name: Display Segmentation Fault Count

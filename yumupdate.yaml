@@ -1,0 +1,22 @@
+---
+- name: Run system updates
+  hosts: all
+  become: true
+  tasks:
+    - name: Install system updates for RHEL and CentOS systems
+      command: yum update -y
+      register: yum_update_result
+      changed_when: yum_update_result.changed
+      when: ansible_os_family == "RedHat"
+
+    - name: Print Yum Update Output
+      debug:
+        msg: "{{ yum_update_result.stdout }}"
+      when: ansible_os_family == "RedHat"
+
+    - name: Install system updates for Debian and Ubuntu systems
+      apt:
+        name: '*'
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "Debian"

@@ -1,0 +1,26 @@
+---
+- name: Check for system updates
+  hosts: all
+  become: true
+  tasks:
+    - name: Check for available updates on RHEL and CentOS systems
+      command: yum check-update
+      register: yum_check_update_result
+      changed_when: false
+      when: ansible_os_family == "RedHat"
+
+    - name: Print Yum Check-Update Output
+      debug:
+        msg: "{{ yum_check_update_result.stdout }}"
+      when: ansible_os_family == "RedHat"
+
+    - name: Check for available updates on Debian and Ubuntu systems
+      command: apt list --upgradable
+      register: apt_check_update_result
+      changed_when: false
+      when: ansible_os_family == "Debian"
+
+    - name: Print Apt Check-Update Output
+      debug:
+        msg: "{{ apt_check_update_result.stdout }}"
+      when: ansible_os_family == "Debian"

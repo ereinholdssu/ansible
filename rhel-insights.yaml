@@ -1,0 +1,17 @@
+---
+- name: Register RHEL system with Red Hat Insights
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure insights-client is installed
+      yum:
+        name: insights-client
+        state: present
+
+    - name: Register the system with Red Hat Insights
+      command: insights-client --register
+      register: insights_output
+
+    - name: Display registration output
+      debug:
+        var: insights_output.stdout

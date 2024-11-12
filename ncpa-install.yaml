@@ -8,6 +8,12 @@
       register: rhel_version
       changed_when: false
 
+    - name: Install NCPA on RHEL 9
+      when: rhel_version.stdout | regex_search('release 9')
+      shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el9.x86_64.rpm
+      args:
+        warn: false
+
     - name: Install NCPA on RHEL 8
       when: rhel_version.stdout | regex_search('release 8')
       shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el8.x86_64.rpm

@@ -5,12 +5,12 @@
   tasks:
     - name: Copy serverinfo.json from local server to remote
       copy:
-        src: /home/ssuadmin/Downloads/UEMS/serverinfo.json
+        src: /home/administrator/Downloads/UEMS/serverinfo.json
         dest: /tmp/serverinfo.json
 
     - name: Copy UEMS Linux Agent binary from local server to remote
       copy:
-        src: /home/ssuadmin/Downloads/UEMS/UEMS_LinuxAgent.bin
+        src: /home/administrator/Downloads/UEMS/UEMS_LinuxAgent.bin
         dest: /tmp/UEMS_LinuxAgent.bin
         mode: +x
 

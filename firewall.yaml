@@ -1,0 +1,23 @@
+---
+- name: Manage firewalld service and port
+  hosts: all
+  become: true
+  tasks:
+    - name: Check if firewalld is installed
+      ansible.builtin.package_facts:
+
+    - name: Ensure firewalld is installed
+      ansible.builtin.yum:
+        name: firewalld
+        state: present
+
+    - name: Ensure firewalld is running and enabled
+      ansible.builtin.systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Manage firewall ports via shell commands
+      shell: >
+        firewall-cmd --zone=public --add-port=5693/tcp --permanent && firewall-cmd --reload
+      when: ansible_facts.services["firewalld"] is defined and ansible_facts.services["firewalld"].state == "running"

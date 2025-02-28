@@ -17,7 +17,8 @@
         state: started
         enabled: yes
 
-    - name: Manage firewall ports via shell commands
+    - name: Manage firewall ports via firewall-cmd
       shell: >
         firewall-cmd --zone=public --add-port=5693/tcp --permanent && firewall-cmd --reload
-      when: ansible_facts.services["firewalld"] is defined and ansible_facts.services["firewalld"].state == "running"
+      when: "'firewalld' in ansible_facts.packages"
+      ignore_errors: yes

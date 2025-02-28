@@ -3,28 +3,17 @@
   hosts: all
   become: true
   tasks:
-    - name: Check RHEL version
-      command: cat /etc/redhat-release
-      register: rhel_version
-      changed_when: false
+    - name: Gather facts about the system
+      ansible.builtin.gather_facts:
 
-    - name: Install NCPA on RHEL 9
-      when: rhel_version.stdout | regex_search('release 9')
-      shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el9.x86_64.rpm
-      args:
-        warn: false
-
-    - name: Install NCPA on RHEL 8
-      when: rhel_version.stdout | regex_search('release 8')
-      shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el8.x86_64.rpm
-      args:
-        warn: false
-
-    - name: Install NCPA on RHEL 7
-      when: rhel_version.stdout | regex_search('release 7')
-      shell: rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el7.x86_64.rpm
-      args:
-        warn: false
+    - name: Install NCPA on RHEL
+      block:
+        - name: Install NCPA package
+          shell: >
+            rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el{{ ansible_distribution_major_version }}.x86_64.rpm
+          when: ansible_distribution in ['RedHat', 'CentOS']
+          args:
+            warn: false
 
     - name: Configure NCPA
       block:
@@ -39,10 +28,9 @@
             name: ncpa_listener
             state: restarted
 
-        - name: Add port 5693/tcp to firewall
-          firewalld:
-            port: 5693/tcp
-            state: enabled
-            permanent: yes
-
+        - name: Manage firewall ports via shell commands
+          shell: >
+            firewall-cmd --zone=public --add-port=5693/tcp --permanent && firewall-cmd --reload
+          when: ansible_facts.services["firewalld"] is defined and ansible_facts.services["firewalld"].state == "running"
+      
       become: true

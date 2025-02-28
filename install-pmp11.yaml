@@ -7,14 +7,12 @@
       copy:
         src: /home/administrator/Downloads/UEMS/serverinfo.json
         dest: /tmp/serverinfo.json
-        remote_src: no
 
     - name: Copy UEMS Linux Agent binary from local server to remote
       copy:
         src: /home/administrator/Downloads/UEMS/UEMS_LinuxAgent.bin
         dest: /tmp/UEMS_LinuxAgent.bin
         mode: +x
-        remote_src: no
 
     - name: Execute UEMS Linux Agent installer
       ansible.builtin.shell:

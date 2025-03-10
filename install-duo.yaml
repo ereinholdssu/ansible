@@ -1,5 +1,5 @@
 ---
-- name: Configure RHEL 9.5 Server with DUO Security
+- name: Configure RHEL Server with DUO Security
   hosts: all
   become: yes
   tasks:
@@ -47,10 +47,16 @@
           failmode = safe
           autopush = yes
 
-    - name: Update SSH configuration
+    - name: Comment out existing SSH settings
+      replace:
+        path: /etc/ssh/sshd_config
+        regexp: '^(?!#)(PasswordAuthentication|KerberosAuthentication|ChallengeResponseAuthentication|AuthenticationMethods|UsePam)\\s+.*'
+        replace: '# \g<0>'
+      backup: yes
+
+    - name: Ensure Duo settings are added to SSHD configuration
       blockinfile:
         path: /etc/ssh/sshd_config
-        backup: yes
         marker: "# DUO SETTINGS"
         block: |
           PasswordAuthentication no

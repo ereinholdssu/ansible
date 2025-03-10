@@ -1,0 +1,77 @@
+---
+- name: Configure RHEL 9.5 Server with DUO Security
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Install required packages
+      yum:
+        name:
+          - openssl-devel
+          - pam-devel
+          - selinux-policy-devel
+          - bzip2
+        state: present
+
+    - name: Create Duo Security repo file
+      copy:
+        dest: /etc/yum.repos.d/duosecurity.repo
+        content: |
+          [duosecurity]
+          name=Duo Security Repository
+          baseurl=https://pkg.duosecurity.com/RedHat/$releasever/$basearch
+          enabled=1
+          gpgcheck=1
+
+    - name: Import Duo Security GPG key
+      rpm_key:
+        key: https://duo.com/DUO-GPG-PUBLIC-KEY.asc
+        state: present
+
+    - name: Install Duo Unix package
+      yum:
+        name: duo_unix
+        state: latest
+
+    - name: Configure Duo PAM authentication
+      copy:
+        dest: /etc/duo/pam_duo.conf
+        owner: root
+        group: root
+        mode: '0600'
+        content: |
+          [duo]
+          ikey = DI9N1IFALIPUU6K920J5
+          skey = y5QKK5BE1b4hKV1lBhxhHf7IxSjQfbAOBDaFNLJH
+          host = api-7c61fb19.duosecurity.com
+          failmode = safe
+          autopush = yes
+
+    - name: Update SSH configuration
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        backup: yes
+        marker: "# DUO SETTINGS"
+        block: |
+          PasswordAuthentication no
+          KerberosAuthentication no
+          ChallengeResponseAuthentication yes
+          AuthenticationMethods keyboard-interactive
+          UsePam yes
+
+    - name: Update PAM SSHD configuration
+      blockinfile:
+        path: /etc/pam.d/sshd
+        insertbefore: BOF
+        marker: "# DUO SETTINGS"
+        block: |
+          auth       [success=2 default=ignore] pam_sss.so
+          auth       [success=1 default=ignore] pam_unix.so use_first_pass
+          auth       requisite     pam_deny.so
+          auth       sufficient    pam_duo.so
+          auth       requisite     pam_deny.so
+
+    - name: Restart SSHD service
+      systemd:
+        name: sshd
+        state: restarted

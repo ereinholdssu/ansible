@@ -52,8 +52,6 @@
         path: /etc/ssh/sshd_config
         regexp: '^(PasswordAuthentication|KerberosAuthentication|ChallengeResponseAuthentication|AuthenticationMethods|UsePam)\s+.*'
         replace: '# \g<0>'
-      backup: yes
-
 
     - name: Ensure Duo settings are added to SSHD configuration
       blockinfile:

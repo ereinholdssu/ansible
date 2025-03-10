@@ -50,7 +50,7 @@
     - name: Comment out existing SSH settings
       replace:
         path: /etc/ssh/sshd_config
-        regexp: '^(?!#)(PasswordAuthentication|KerberosAuthentication|ChallengeResponseAuthentication|AuthenticationMethods|UsePam)\\s+.*'
+        regexp: '^(?!#)(PasswordAuthentication|KerberosAuthentication|ChallengeResponseAuthentication|AuthenticationMethods|UsePam)\s+.*'
         replace: '# \g<0>'
       backup: yes
 

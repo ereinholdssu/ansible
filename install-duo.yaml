@@ -48,16 +48,10 @@
           autopush = yes
 
     - name: Backup /etc/ssh/sshd_config
-      copy:
-        src: /etc/ssh/sshd_config
-        dest: /etc/ssh/sshd_config.bak
-        backup: yes
+      shell: cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
     - name: Backup /etc/pam.d/sshd
-      copy:
-        src: /etc/pam.d/sshd
-        dest: /etc/pam.d/sshd.bak
-        backup: yes
+      shell: cp /etc/pam.d/sshd /etc/pam.d/sshd.bak
 
     - name: Comment out existing SSH settings
       replace:
@@ -74,7 +68,6 @@
           KerberosAuthentication no
           ChallengeResponseAuthentication yes
           AuthenticationMethods keyboard-interactive
-          UsePam yes
 
     - name: Update PAM SSHD configuration
       blockinfile:

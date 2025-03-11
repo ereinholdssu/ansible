@@ -3,7 +3,7 @@
   hosts: all
   become: yes
   tasks:
-    - name: Backup /etc/ssh/sshd_config using shell command
+    - name: Backup /etc/ssh/sshd_config
       shell: cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
       become: yes
 

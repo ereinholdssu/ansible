@@ -3,11 +3,9 @@
   hosts: all
   become: yes
   tasks:
-    - name: Backup /etc/ssh/sshd_config
-      fetch:
-        src: /etc/ssh/sshd_config
-        dest: /tmp/sshd_config.bak
-        flat: yes
+    - name: Backup /etc/ssh/sshd_config using shell command
+      shell: cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+      become: yes
 
     - name: Backup /etc/pam.d/sshd
       copy:

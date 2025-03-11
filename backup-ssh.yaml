@@ -8,7 +8,5 @@
       become: yes
 
     - name: Backup /etc/pam.d/sshd
-      copy:
-        src: /etc/pam.d/sshd
-        dest: /etc/pam.d/sshd.bak
-        backup: yes
+      shell: cp /etc/pam.d/sshd /etc/pam.d/sshd.bak
+      become: yes

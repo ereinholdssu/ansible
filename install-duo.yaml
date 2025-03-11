@@ -47,6 +47,18 @@
           failmode = safe
           autopush = yes
 
+    - name: Backup /etc/ssh/sshd_config
+      copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config.bak
+        backup: yes
+
+    - name: Backup /etc/pam.d/sshd
+      copy:
+        src: /etc/pam.d/sshd
+        dest: /etc/pam.d/sshd.bak
+        backup: yes
+
     - name: Comment out existing SSH settings
       replace:
         path: /etc/ssh/sshd_config

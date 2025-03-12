@@ -8,4 +8,4 @@
 
     - name: Display Uptime
       debug:
-        msg: "Uptime on {{ inventory_hostname }} is {{ uptime_output.stdout }}"
+        msg: "The uptime on {{ inventory_hostname }} is {{ uptime_output.stdout }}"

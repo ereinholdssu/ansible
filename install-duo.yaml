@@ -67,7 +67,6 @@
           PasswordAuthentication no
           KerberosAuthentication no
           ChallengeResponseAuthentication yes
-          AuthenticationMethods keyboard-interactive
 
     - name: Update PAM SSHD configuration
       blockinfile:
@@ -75,8 +74,8 @@
         insertbefore: BOF
         marker: "# DUO SETTINGS"
         block: |
-          auth       [success=2 default=ignore] pam_sss.so
-          auth       [success=1 default=ignore] pam_unix.so use_first_pass
+          auth       [success=2 default=ignore] pam_unix.so
+          auth       [success=1 default=ignore] pam_sss.so use_first_pass
           auth       requisite     pam_deny.so
           auth       sufficient    pam_duo.so
           auth       requisite     pam_deny.so

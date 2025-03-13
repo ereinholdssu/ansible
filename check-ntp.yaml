@@ -1,6 +1,6 @@
 ---
-- name: Check NTP synchronization settings
-  hosts: all
+- name: Check NTP synchronization settings on RHEL servers
+  hosts: rhel_servers
   become: yes
   tasks:
     - name: Ensure chrony is installed
@@ -8,11 +8,23 @@
         name: chrony
         state: present
 
-    - name: Get the current NTP server configuration
-      command: chronyc sources
-      register: chrony_sources
+    - name: Check for 'iburst' entries in /etc/chrony.conf
+      command: grep 'iburst' /etc/chrony.conf
+      register: chrony_iburst
       changed_when: false
+      ignore_errors: true
 
-    - name: Display NTP server configuration
+    - name: Check if chronyd service is enabled
+      command: systemctl is-enabled chronyd
+      register: chronyd_enabled
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display NTP configuration details
       debug:
-        msg: "{{ chrony_sources.stdout }}"
+        msg: |
+          NTP Servers (with iburst):
+          {{ chrony_iburst.stdout_lines | join('\n') | default('No NTP servers found in chrony.conf') }}
+
+          chronyd service enabled: 
+          {{ chronyd_enabled.stdout | default('chronyd service is not enabled') }}

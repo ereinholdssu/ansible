@@ -1,6 +1,6 @@
 ---
 - name: Check NTP synchronization settings on RHEL servers
-  hosts: rhel_servers
+  hosts: all
   become: yes
   tasks:
     - name: Ensure chrony is installed

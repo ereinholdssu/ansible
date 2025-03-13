@@ -1,0 +1,45 @@
+---
+- name: Configure NTP servers on RHEL servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure chrony is installed
+      package:
+        name: chrony
+        state: present
+
+    - name: Backup existing chrony.conf
+      copy:
+        src: /etc/chrony.conf
+        dest: /etc/chrony.conf.bak
+        remote_src: yes
+      ignore_errors: yes
+
+    - name: Comment out existing NTP servers that use iburst
+      replace:
+        path: /etc/chrony.conf
+        regexp: '^(server\s+\S+\s+iburst)'
+        replace: '# \1'
+      notify: Restart chronyd
+
+    - name: Set custom NTP servers in chrony.conf
+      blockinfile:
+        path: /etc/chrony.conf
+        marker: "# ANSIBLE MANAGED BLOCK"
+        block: |
+          server dctime01-pdc.salemstate.edu iburst
+          server dctime02.salemstate.edu iburst
+          server dctime03.salemstate.edu iburst
+      notify: Restart chronyd
+
+    - name: Ensure chronyd service is enabled and running
+      systemd:
+        name: chronyd
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: Restart chronyd
+      systemd:
+        name: chronyd
+        state: restarted

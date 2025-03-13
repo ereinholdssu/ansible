@@ -23,8 +23,11 @@
     - name: Display NTP configuration details
       debug:
         msg: |
-          NTP Servers (with iburst):
-          {{ chrony_iburst.stdout_lines | join('\n') | default('No NTP servers found in chrony.conf') }}
-
-          chronyd service enabled: 
-          {{ chronyd_enabled.stdout | default('chronyd service is not enabled') }}
+          NTP Configuration for {{ inventory_hostname }}:
+          - NTP Servers with iburst:
+            {% if chrony_iburst.stdout_lines %}
+              {{ chrony_iburst.stdout_lines | join(', ') }}
+            {% else %}
+              No NTP servers with iburst configured
+            {% endif %}
+          - chronyd service: {{ chronyd_enabled.stdout | default('Not Enabled') }}

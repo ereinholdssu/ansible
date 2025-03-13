@@ -1,5 +1,5 @@
 ---
-- name: Check NTP synchronization settings on RHEL servers
+- name: Configure NTP servers on RHEL servers
   hosts: all
   become: yes
   tasks:
@@ -8,26 +8,38 @@
         name: chrony
         state: present
 
-    - name: Check for 'iburst' entries in /etc/chrony.conf
-      command: grep 'iburst' /etc/chrony.conf
-      register: chrony_iburst
-      changed_when: false
-      ignore_errors: true
+    - name: Backup existing chrony.conf
+      copy:
+        src: /etc/chrony.conf
+        dest: /etc/chrony.conf.bak
+        remote_src: yes
+      ignore_errors: yes
 
-    - name: Check if chronyd service is enabled
-      command: systemctl is-enabled chronyd
-      register: chronyd_enabled
-      changed_when: false
-      ignore_errors: true
+    - name: Comment out existing NTP servers that use iburst
+      replace:
+        path: /etc/chrony.conf
+        regexp: '^(server\s+\S+\s+iburst)'
+        replace: '# \1'
+      notify: Restart chronyd
 
-    - name: Display NTP configuration details
-      debug:
-        msg: |
-          NTP Configuration for {{ inventory_hostname }}:
-          - NTP Servers with iburst:
-            {% if chrony_iburst.stdout_lines %}
-              {{ chrony_iburst.stdout_lines | join(', ') }}
-            {% else %}
-              No NTP servers with iburst configured
-            {% endif %}
-          - chronyd service: {{ chronyd_enabled.stdout | default('Not Enabled') }}
+    - name: Set custom NTP servers in chrony.conf
+      blockinfile:
+        path: /etc/chrony.conf
+        marker: "# ANSIBLE MANAGED BLOCK"
+        block: |
+          server dctime01-pdc.salemstate.edu iburst
+          server dctime02.salemstate.edu iburst
+          server dctime03.salemstate.edu iburst
+      notify: Restart chronyd
+
+    - name: Ensure chronyd service is enabled and running
+      systemd:
+        name: chronyd
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: Restart chronyd
+      systemd:
+        name: chronyd
+        state: restarted

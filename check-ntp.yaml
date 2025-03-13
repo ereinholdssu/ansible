@@ -1,0 +1,18 @@
+---
+- name: Check NTP synchronization settings
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure chrony is installed
+      package:
+        name: chrony
+        state: present
+
+    - name: Get the current NTP server configuration
+      command: chronyc sources
+      register: chrony_sources
+      changed_when: false
+
+    - name: Display NTP server configuration
+      debug:
+        msg: "{{ chrony_sources.stdout }}"

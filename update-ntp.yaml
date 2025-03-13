@@ -15,10 +15,10 @@
         remote_src: yes
       ignore_errors: yes
 
-    - name: Comment out existing NTP servers that use iburst
+    - name: Comment out existing NTP servers and pools with iburst
       replace:
         path: /etc/chrony.conf
-        regexp: '^(server\s+\S+\s+iburst)'
+        regexp: '^(?:(server|pool)\s+\S+\s+iburst)'
         replace: '# \1'
       notify: Restart chronyd
 

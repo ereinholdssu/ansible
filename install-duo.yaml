@@ -67,6 +67,7 @@
           PasswordAuthentication no
           KerberosAuthentication no
           ChallengeResponseAuthentication yes
+          UsePam yes
 
     - name: Update PAM SSHD configuration
       blockinfile:

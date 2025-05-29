@@ -1,0 +1,20 @@
+---
+- name: Uninstall Patch Manager Plus Agent
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure the uninstall script exists
+      stat:
+        path: /usr/local/manageengine/uems_agent/RemoveUEMSAgent.sh
+      register: uninstall_script
+
+    - name: Run Patch Manager Plus agent uninstall script
+      command: /usr/local/manageengine/uems_agent/RemoveUEMSAgent.sh
+      when: uninstall_script.stat.exists and uninstall_script.stat.mode|int is search("7..")
+      register: uninstall_result
+      ignore_errors: yes
+
+    - name: Print uninstall result
+      debug:
+        var: uninstall_result.stdout_lines
+      when: uninstall_result is defined

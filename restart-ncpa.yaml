@@ -1,0 +1,12 @@
+---
+- name: Restart NCPA Listener service
+  hosts: all
+  become: yes
+  tasks:
+    - name: Restart ncpa_listener service
+      command: /etc/init.d/ncpa_listener restart
+      register: ncpa_result
+
+    - name: Show command output
+      debug:
+        var: ncpa_result.stdout_lines

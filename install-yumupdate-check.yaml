@@ -14,7 +14,16 @@
         warn: false
       when: ansible_os_family == "RedHat"
 
+    - name: Print full stdout for debugging (optional)
+      debug:
+        var: yum_check.stdout
+      when:
+        - ansible_os_family == "RedHat"
+        - yum_check.stdout is defined
+
     - name: Extract Transaction Summary from yum output
       debug:
         msg: "{{ yum_check.stdout | regex_search('Transaction Summary.*', multiline=True) }}"
-      when: ansible_os_family == "RedHat"
+      when:
+        - ansible_os_family == "RedHat"
+        - yum_check.stdout is defined

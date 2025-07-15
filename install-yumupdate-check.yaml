@@ -1,29 +1,16 @@
 ---
-- name: Check how many updates are needed on RHEL/CentOS
+- name: Count available yum updates
   hosts: all
   become: true
-  gather_facts: true
+  gather_facts: false
 
   tasks:
-    - name: Simulate yum update to get transaction summary
-      shell: yum update --assumeno
-      register: yum_check
+    - name: Count updates with yum check-update
+      shell: yum check-update | wc -l
+      register: update_count
       changed_when: false
       failed_when: false
-      args:
-        warn: false
-      when: ansible_os_family == "RedHat"
 
-    - name: Print full stdout for debugging (optional)
+    - name: Show number of available updates
       debug:
-        var: yum_check.stdout
-      when:
-        - ansible_os_family == "RedHat"
-        - yum_check.stdout is defined
-
-    - name: Extract Transaction Summary from yum output
-      debug:
-        msg: "{{ yum_check.stdout | regex_search('Transaction Summary.*', multiline=True) }}"
-      when:
-        - ansible_os_family == "RedHat"
-        - yum_check.stdout is defined
+        msg: "Available updates on {{ inventory_hostname }}: {{ update_count.stdout }}"

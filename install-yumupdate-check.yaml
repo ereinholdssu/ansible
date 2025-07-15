@@ -1,0 +1,39 @@
+---
+- name: Check for available system updates
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Check pending updates on RedHat-based systems (yum)
+      shell: yum updateinfo summary || yum update --assumeno
+      register: yum_check
+      changed_when: false
+      when: ansible_os_family == "RedHat"
+
+    - name: Print RedHat update summary
+      debug:
+        msg: "{{ yum_check.stdout }}"
+      when: ansible_os_family == "RedHat"
+
+    - name: Update apt cache (Debian-based systems)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Check pending updates on Debian-based systems
+      shell: apt list --upgradable 2>/dev/null | grep -v 'Listing...'
+      register: apt_check
+      changed_when: false
+      when: ansible_os_family == "Debian"
+
+    - name: Count upgradable packages on Debian
+      set_fact:
+        apt_upgrade_count: "{{ apt_check.stdout_lines | length }}"
+      when: ansible_os_family == "Debian"
+
+    - name: Print Debian update summary
+      debug:
+        msg: >
+          Upgradeable packages on {{ inventory_hostname }}: {{ apt_upgrade_count }}
+      when: ansible_os_family == "Debian"

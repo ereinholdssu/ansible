@@ -9,6 +9,9 @@
       shell: yum update --assumeno
       register: yum_check
       changed_when: false
+      failed_when: false
+      args:
+        warn: false
       when: ansible_os_family == "RedHat"
 
     - name: Extract Transaction Summary from yum output

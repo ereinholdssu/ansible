@@ -1,0 +1,19 @@
+---
+- name: Check partition table type on all servers
+  hosts: all
+  gather_facts: no
+  become: yes
+
+  tasks:
+    - name: Run parted to detect partition table
+      command: parted -l
+      register: parted_output
+      changed_when: false
+
+    - name: Extract partition table lines
+      set_fact:
+        partition_tables: "{{ parted_output.stdout_lines | select('search', 'Partition Table') | list }}"
+
+    - name: Show partition table results
+      debug:
+        msg: "{{ inventory_hostname }} -> {{ partition_tables }}"

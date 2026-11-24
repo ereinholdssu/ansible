@@ -7,20 +7,18 @@
       "8":  https://repo.nagios.com/nagios/8/nagios-repo-8-2.el8.noarch.rpm
       "9":  https://repo.nagios.com/nagios/9/nagios-repo-9-2.el9.noarch.rpm
       "10": https://repo.nagios.com/nagios/10/nagios-repo-10-1.el10.noarch.rpm
-    # Replace with your (rotated) token, or set ncpa_token in a Semaphore
-    # variable group / vault - that value overrides this one.
+    ncpa_token: "Nagk2F@hVr3Ls6Tq8Xj@#SSU"
 
   tasks:
     - name: Import Nagios GPG key
-      ansible.builtin.rpm_key:
-        key: https://repo.nagios.com/GPG-KEY-NAGIOS-V3
-        state: present
+      ansible.builtin.command: rpm --import https://repo.nagios.com/GPG-KEY-NAGIOS-V3
+      changed_when: false
       when: ansible_os_family == 'RedHat'
 
     - name: Install Nagios repo
-      ansible.builtin.dnf:
-        name: "{{ nagios_repo_rpm[ansible_distribution_major_version] }}"
-        state: present
+      ansible.builtin.command: dnf install -y {{ nagios_repo_rpm[ansible_distribution_major_version] }}
+      register: repo_install
+      changed_when: "'Nothing to do' not in repo_install.stdout"
       when: ansible_os_family == 'RedHat'
 
     - name: Install NCPA
@@ -34,7 +32,7 @@
       ansible.builtin.replace:
         path: /usr/local/ncpa/etc/ncpa.cfg
         regexp: '^community_string = .*'
-        replace: "community_string = Nagk2F@hVr3Ls6Tq8Xj@#SSU"
+        replace: "community_string = {{ ncpa_token }}"
       no_log: true
       notify: Restart NCPA
 

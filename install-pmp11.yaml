@@ -4,19 +4,52 @@
   become: true
   tasks:
     - name: Copy serverinfo.json from local server to remote
-      copy:
+      ansible.builtin.copy:
         src: /home/semaphore/data/serverinfo.json
         dest: /tmp/serverinfo.json
-        remote_src: no
+        mode: "0644"
 
     - name: Copy UEMS Linux Agent binary from local server to remote
-      copy:
+      ansible.builtin.copy:
         src: /home/semaphore/data/UEMS_LinuxAgent.bin
         dest: /tmp/UEMS_LinuxAgent.bin
-        mode: +x
-        remote_src: no
+        mode: "0755"
 
-    - name: Execute UEMS Linux Agent installer
-      ansible.builtin.shell:
-        cmd: "./UEMS_LinuxAgent.bin"
-        chdir: "/tmp"
+    - name: Execute UEMS Linux Agent installer (answers both y/n prompts)
+      ansible.builtin.command:
+        cmd: ./UEMS_LinuxAgent.bin
+        chdir: /tmp
+        stdin: "y\ny"          # 1) agree to install  2) uninstall existing agent and re-install
+      async: 900               # give up after 15 minutes instead of hanging
+      poll: 15
+      register: uems_install
+
+    - name: Show installer output
+      ansible.builtin.debug:
+        var: uems_install.stdout_lines
+
+    - name: Make sure the agent service is enabled and running
+      ansible.builtin.systemd:
+        name: dcservice
+        state: started
+        enabled: true
+
+    - name: Check installed agent version
+      ansible.builtin.shell: ./dctroubleshootingtool | grep -A1 "AGENT VERSION"
+      args:
+        chdir: /usr/local/manageengine/uems_agent/bin
+      register: uems_version
+      changed_when: false
+      failed_when: false
+
+    - name: Show agent version
+      ansible.builtin.debug:
+        var: uems_version.stdout_lines
+
+    - name: Clean up installer files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/UEMS_LinuxAgent.bin
+        - /tmp/serverinfo.json

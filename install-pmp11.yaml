@@ -11,8 +11,8 @@
 
     - name: Copy UEMS Linux Agent binary from local server to remote
       ansible.builtin.copy:
-        src: /home/semaphore/data/UEMS_LinuxAgent.bin
-        dest: /tmp/UEMS_LinuxAgent.bin
+        src: /home/semaphore/data/UEMS_LinuxAgent_x64.bin
+        dest: /tmp/UEMS_LinuxAgent_x64.bin
         mode: "0755"
 
     - name: Execute UEMS Linux Agent installer (answers both y/n prompts)

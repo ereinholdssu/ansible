@@ -2,40 +2,64 @@
 - name: Install NCPA and configure
   hosts: all
   become: true
+  vars:
+    nagios_repo_rpm:
+      "8":  https://repo.nagios.com/nagios/8/nagios-repo-8-2.el8.noarch.rpm
+      "9":  https://repo.nagios.com/nagios/9/nagios-repo-9-2.el9.noarch.rpm
+      "10": https://repo.nagios.com/nagios/10/nagios-repo-10-1.el10.noarch.rpm
+
   tasks:
-    - name: Gather facts about the system
-      ansible.builtin.gather_facts:
+    - name: Import Nagios GPG key
+      ansible.builtin.rpm_key:
+        key: https://repo.nagios.com/GPG-KEY-NAGIOS-V3
+        state: present
+      when: ansible_os_family == 'RedHat'
 
-    - name: Install NCPA package
-      shell: >
-        rpm -Uvh https://assets.nagios.com/downloads/ncpa/ncpa-latest.el{{ ansible_distribution_major_version }}.x86_64.rpm
-      when: ansible_distribution in ['RedHat', 'CentOS']
+    - name: Install Nagios repo
+      ansible.builtin.dnf:
+        name: "{{ nagios_repo_rpm[ansible_distribution_major_version] }}"
+        state: present
+      when: ansible_os_family == 'RedHat'
 
-    - name: Configure NCPA
-      block:
-        - name: Set community string in ncpa.cfg
-          replace:
-            path: /usr/local/ncpa/etc/ncpa.cfg
-            regexp: '^community_string = .*'
-            replace: 'community_string = Nagk2F@hVr3Ls6Tq8Xj@#SSU'
+    - name: Install NCPA
+      ansible.builtin.dnf:
+        name: ncpa
+        state: present
+        update_cache: true
+      when: ansible_os_family == 'RedHat'
 
-        - name: Restart NCPA listener
-          service:
-            name: ncpa_listener
-            state: restarted
+    - name: Set community string
+      ansible.builtin.replace:
+        path: /usr/local/ncpa/etc/ncpa.cfg
+        regexp: '^community_string = .*'
+        replace: "community_string = Nagk2F@hVr3Ls6Tq8Xj@#SSU"
+      no_log: true
+      notify: Restart NCPA
 
-        - name: Check if firewalld is installed
-          ansible.builtin.package_facts:
+    - name: Gather service and package facts
+      ansible.builtin.service_facts:
 
-        - name: Ensure firewalld is installed and running
-          ansible.builtin.systemd:
-            name: firewalld
-            state: started
-            enabled: yes
-          when: "'firewalld' in ansible_facts.packages"
+    - ansible.builtin.package_facts:
 
-        - name: Manage firewall ports via shell commands
-          shell: >
-            firewall-cmd --zone=public --add-port=5693/tcp --permanent && firewall-cmd --reload
-      
-      become: true
+    - name: Ensure firewalld is running
+      ansible.builtin.systemd:
+        name: firewalld
+        state: started
+        enabled: true
+      when: "'firewalld' in ansible_facts.packages"
+
+    - name: Open NCPA port 5693
+      ansible.posix.firewalld:
+        port: 5693/tcp
+        zone: public
+        permanent: true
+        immediate: true
+        state: enabled
+      when: "'firewalld' in ansible_facts.packages"
+
+  handlers:
+    - name: Restart NCPA
+      ansible.builtin.service:
+        name: "{{ 'ncpa' if 'ncpa.service' in ansible_facts.services else 'ncpa_listener' }}"
+        state: restarted
+        enabled: true

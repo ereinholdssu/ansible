@@ -9,7 +9,6 @@
       "10": https://repo.nagios.com/nagios/10/nagios-repo-10-1.el10.noarch.rpm
     # Replace with your (rotated) token, or set ncpa_token in a Semaphore
     # variable group / vault - that value overrides this one.
-    ncpa_token: "CHANGE_ME"
 
   tasks:
     - name: Import Nagios GPG key

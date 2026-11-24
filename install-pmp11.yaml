@@ -17,9 +17,8 @@
 
     - name: Execute UEMS Linux Agent installer (answers both y/n prompts)
       ansible.builtin.command:
-        cmd: ./UEMS_LinuxAgent_x64.bin
+        cmd: ./UEMS_LinuxAgent_x64.bin -c
         chdir: /tmp
-        stdin: "y\ny"          # 1) agree to install  2) uninstall existing agent and re-install
       async: 900               # give up after 15 minutes instead of hanging
       poll: 15
       register: uems_install
